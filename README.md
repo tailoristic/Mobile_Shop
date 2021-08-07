@@ -1,7 +1,6 @@
-# Shopping Cart
+# Mobile Shop
 
-A new Flutter project.
-
+Goal of this project is to make an app which fetches data from firebase with email authentication
 ## Getting Started
 
 This project is a starting point for a Flutter application.
