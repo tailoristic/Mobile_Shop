@@ -45,6 +45,16 @@ class ProductCard extends StatelessWidget {
                 imageUrl: productModel.image,
                 fit: BoxFit.cover,
                 memCacheHeight: 620,
+                 placeholder: (_, value) {
+                  return Container(
+                    height: 120.0,
+                    width: 120.0,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.grey[400],
+                    ),
+                  );
+                },
               ),
             ),
           ),
