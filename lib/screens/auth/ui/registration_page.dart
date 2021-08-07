@@ -7,16 +7,30 @@ import 'package:shopping_cart/screens/auth/controllers/registration_controller.d
 import 'package:shopping_cart/utils/validators.dart';
 import 'package:shopping_cart/widgets/custom_button.dart';
 
-class RegistrationPage extends StatelessWidget {
+class RegistrationPage extends StatefulWidget {
+  @override
+  _RegistrationPageState createState() => _RegistrationPageState();
+}
+
+class _RegistrationPageState extends State<RegistrationPage> {
+  /// TEXT CONTROLLERS
+  TextEditingController emailController;
+  TextEditingController dateOfBirthController;
+  TextEditingController passwordController;
+  TextEditingController confirmPasswordController;
+
+  /// STATE MANAGERS
   final RegistrationController registrationController =
-      Get.put(RegistrationController());
+      Get.put<RegistrationController>(RegistrationController());
+  final FirebaseController firebaseController = Get.find<FirebaseController>();
   final ValueNotifier<bool> _passwordVisible = ValueNotifier<bool>(false);
 
-  final FirebaseController firebaseController = Get.find<FirebaseController>();
+  ///
+  final GlobalKey<FormState> formStateKey = GlobalKey<FormState>();
+  final FocusScopeNode _focusNode = FocusScopeNode();
 
   String _validatePassword(String value) {
-    if (registrationController.passwordController.text !=
-        registrationController.confirmPasswordController.text) {
+    if (passwordController.text != confirmPasswordController.text) {
       return "Password does not match";
     } else {
       return null;
@@ -24,30 +38,54 @@ class RegistrationPage extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    super.initState();
+    emailController = TextEditingController();
+    dateOfBirthController = TextEditingController();
+    passwordController = TextEditingController();
+    confirmPasswordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    [
+      emailController,
+      dateOfBirthController,
+      passwordController,
+      confirmPasswordController,
+    ].forEach((controller) {
+      controller.dispose();
+    });
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.arrow_back_ios,
-                      color: AppTheme.kWhite,
-                    ),
-                    onPressed: () {
-                      Get.back();
-                    },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios,
+                    color: AppTheme.kWhite,
                   ),
+                  onPressed: () {
+                    Get.back();
+                  },
                 ),
-                Spacer(),
-                Form(
-                  key: registrationController.formStateKey,
+              ),
+              Spacer(),
+              Form(
+                key: formStateKey,
+                child: FocusScope(
+                  node: _focusNode,
                   child: ListView(
                     padding: const EdgeInsets.all(SizeConstant.kDefaultPadding),
                     shrinkWrap: true,
@@ -65,7 +103,8 @@ class RegistrationPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 15.0),
                       TextFormField(
-                        controller: registrationController.emailController,
+                        onEditingComplete: _focusNode.nextFocus,
+                        controller: emailController,
                         validator: Validator.validateEmail,
                         style: const TextStyle(color: AppTheme.kWhite),
                         keyboardType: TextInputType.emailAddress,
@@ -93,13 +132,20 @@ class RegistrationPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 15.0),
                       TextFormField(
-                        controller:
-                            registrationController.dateOfBirthController,
+                        onEditingComplete: _focusNode.nextFocus,
+                        controller: dateOfBirthController,
                         validator: Validator.validatePassword,
                         style: const TextStyle(color: AppTheme.kWhite),
+                        onTap: () {
+                          registrationController.pickDate(
+                            context: context,
+                            firstDate: DateTime(1800),
+                            textController: dateOfBirthController,
+                          );
+                        },
                         decoration: InputDecoration(
                           hintText: 'BirthDate',
-                          prefixIcon: Icon(
+                          prefixIcon: const Icon(
                             Icons.calendar_today_outlined,
                             color: AppTheme.kWhite,
                           ),
@@ -125,14 +171,14 @@ class RegistrationPage extends StatelessWidget {
                         builder:
                             (BuildContext context, bool value, Widget child) {
                           return TextFormField(
-                            controller:
-                                registrationController.passwordController,
+                            onEditingComplete: _focusNode.nextFocus,
+                            controller: passwordController,
                             validator: Validator.validatePassword,
                             style: const TextStyle(color: AppTheme.kWhite),
                             obscureText: !value,
                             decoration: InputDecoration(
                               hintText: 'Password',
-                              prefixIcon: Icon(
+                              prefixIcon: const Icon(
                                 Icons.privacy_tip_outlined,
                                 color: AppTheme.kWhite,
                               ),
@@ -160,14 +206,14 @@ class RegistrationPage extends StatelessWidget {
                         builder:
                             (BuildContext context, bool value, Widget child) {
                           return TextFormField(
-                            controller: registrationController
-                                .confirmPasswordController,
+                            onEditingComplete: _focusNode.nextFocus,
+                            controller: confirmPasswordController,
                             validator: _validatePassword,
                             style: const TextStyle(color: AppTheme.kWhite),
                             obscureText: !value,
                             decoration: InputDecoration(
                               hintText: 'Confirm Password',
-                              prefixIcon: Icon(
+                              prefixIcon: const Icon(
                                 Icons.privacy_tip_outlined,
                                 color: AppTheme.kWhite,
                               ),
@@ -204,38 +250,35 @@ class RegistrationPage extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 30.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Obx(
-                      () => CustomButton(
-                        title: "Sign up",
-                        height: 60.0,
-                        width: Get.width / 2,
-                        isLoading: firebaseController.regLoader.value,
-                        onTap: () {
-                          if (registrationController.formStateKey.currentState
-                              .validate()) {
-                            /// CALL CREATE ACCOUNT HERE
-                            firebaseController.createUser(
-                              email: registrationController.emailController.text
-                                  .trim(),
-                              password: registrationController
-                                  .passwordController.text
-                                  .trim(),
-                              dateOfBirth: registrationController
-                                  .dateOfBirthController.text
-                                  .trim(),
-                            );
-                          }
-                        },
-                      ),
+              ),
+              const SizedBox(height: 30.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Obx(
+                    () => CustomButton(
+                      title: "Sign up",
+                      height: 60.0,
+                      width: Get.width / 2,
+                      isLoading: firebaseController.regLoader.value,
+                      onTap: () {
+                        if (formStateKey.currentState.validate()) {
+                          /// CALL CREATE ACCOUNT HERE
+                          firebaseController.createUser(
+                            email: emailController.text.trim(),
+                            password: passwordController.text.trim(),
+                            dateOfBirth: dateOfBirthController.text.trim(),
+                          );
+                        }
+                      },
                     ),
-                  ],
-                ),
-                Spacer(),
-                GestureDetector(
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Flexible(
+                flex: 2,
+                child: GestureDetector(
                   onTap: () {
                     Get.back();
                   },
@@ -243,7 +286,7 @@ class RegistrationPage extends StatelessWidget {
                     child: RichText(
                       text: TextSpan(
                         text: "Already have an Account?",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18.0,
                           color: AppTheme.kWhite,
                         ),
@@ -261,8 +304,8 @@ class RegistrationPage extends StatelessWidget {
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

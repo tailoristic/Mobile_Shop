@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import 'auth/ui/login_page.dart';
+import 'package:shopping_cart/main.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key key}) : super(key: key);
@@ -18,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Timer(const Duration(seconds: 3), () {
       Get.offAll(
-        () => LoginPage(),
+        () => AuthHelper(),
         duration: const Duration(
           microseconds: 200,
         ),
@@ -35,11 +34,10 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            /// TODO:ADD APP ICON
             /// ITS REALLY DIFFICULT TO CODE UI WHEN YOU DONT HAVE DESIGN READY..
-            Text(
+            const Text(
               "Mobile Shop",
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 30.0,
                 color: Colors.white,
               ),

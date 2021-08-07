@@ -11,4 +11,7 @@ Future<void> initHive() async {
 
 class LocalX {
   static Box<dynamic> getSettingBox() => Hive.box(_settings);
+
+  static String get userID => getSettingBox().get('id');
+  static setUserId(userID) => getSettingBox().put('id', userID);
 }

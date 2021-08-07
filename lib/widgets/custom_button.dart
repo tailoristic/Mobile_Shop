@@ -6,6 +6,7 @@ class CustomButton extends StatelessWidget {
   final double width;
   final VoidCallback onTap;
   final bool isLoading;
+  final double textSize;
   const CustomButton({
     Key key,
     @required this.title,
@@ -13,6 +14,7 @@ class CustomButton extends StatelessWidget {
     @required this.width,
     @required this.onTap,
     @required this.isLoading,
+    this.textSize = 22.0,
   }) : super(key: key);
 
   @override
@@ -37,7 +39,7 @@ class CustomButton extends StatelessWidget {
                   child: Text(
                     title,
                     style: TextStyle(
-                      fontSize: 22.0,
+                      fontSize: textSize,
                       color: Colors.white,
                     ),
                   ),

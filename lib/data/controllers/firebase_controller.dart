@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:shopping_cart/data/database/hive_db.dart';
 import 'package:shopping_cart/screens/auth/ui/login_page.dart';
 import 'package:shopping_cart/screens/products/ui/home_page.dart';
 
@@ -12,8 +14,10 @@ class FirebaseController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    /// THIS WILL HELP US TO LISTEN TO THE AUTH STATE CHANGES
     _firebaseUser.bindStream(_firebaseAuth.authStateChanges());
-    print("Current AUTH:   ${_firebaseAuth.currentUser}");
+    // print("Current AUTH:   ${_firebaseAuth.currentUser}");
   }
 
   /// ! CREATE USER
@@ -31,6 +35,22 @@ class FirebaseController extends GetxController {
           email: email, password: password);
       if (register != null) {
         data.add(userdata).then((value) => Get.back());
+        Get.snackbar(
+          "Account Created",
+          "Please login to continue",
+        );
+        Get.snackbar(
+          "",
+          "",
+          titleText: Text(
+            "Account Created",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          messageText: Text("Please login to continue"),
+          backgroundColor: Colors.white,
+        );
       }
     } catch (e) {
       Get.snackbar("Error while creating account ", e.toString());
@@ -48,6 +68,7 @@ class FirebaseController extends GetxController {
           email: email, password: password);
       if (data != null) {
         Get.offAll(HomePage());
+        LocalX.setUserId(data.user.uid);
       }
     } on PlatformException {
       Get.snackbar("Error while sign in ", "Check your email and password");
@@ -65,7 +86,8 @@ class FirebaseController extends GetxController {
   void signout() async {
     try {
       await _firebaseAuth.signOut();
-      Get.offAll(LoginPage());
+      LocalX.setUserId(null);
+      Get.offAll(() => LoginPage());
     } catch (e) {
       print(e.toString());
     }
