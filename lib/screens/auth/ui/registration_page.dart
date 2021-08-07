@@ -107,6 +107,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         controller: emailController,
                         validator: Validator.validateEmail,
                         style: const TextStyle(color: AppTheme.kWhite),
+                        autofillHints: [AutofillHints.email],
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           hintText: 'Email',
