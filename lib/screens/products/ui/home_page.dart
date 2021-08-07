@@ -87,7 +87,7 @@ class HomePage extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(
-                  horizontal: SizeConstant.kDefaultPadding),
+                  horizontal: SizeConstant.kDefaultPadding, vertical:10.0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
